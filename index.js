@@ -31,7 +31,7 @@ client.on('messageCreate', async (message) => {
 });
 client.on('voiceStateUpdate', async (oldState, newState) => {
     const targetGuild = client.guilds.cache.get(guildmessage);
-    if (newState.channelId === targetVoiceChannelId && newState.member.id !== client.user.id) {
+    if (newState.channelId === targetVoiceChannelId && newState.member.id !== client.user.id && oldState.channelId !== newState.channelId) {
         const userId = newState.member.id;
 
         const targetTextChannel = targetGuild.channels.cache.get('1086413403767181394');
@@ -43,8 +43,15 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         } else if (currentTrack === 'musique_attente_1.mp3') {
             targetTextChannel.send(`<@${userId}> est dans attente d'aide ! <@&1084556184725508147> <@&1084555956995756137>`);
         }
+
+        // Check if the bot is not in the voice channel and connect it
+        const botInVoiceChannel = newState.guild.members.cache.get(client.user.id).voice.channelId;
+        if (!botInVoiceChannel || botInVoiceChannel !== targetVoiceChannelId) {
+            await playAudio(newState.guild, currentTrack);
+        }
     }
 });
+
 
 const playAudio = async (guild, filePath) => {
     const targetGuild = client.guilds.cache.get(targetGuildId);
@@ -87,6 +94,11 @@ const playAudio = async (guild, filePath) => {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+
+    // Set a default audio file for currentTrack if it's null
+    if (!currentTrack) {
+        currentTrack = 'sons_attente.mp3';
+    }
 });
 
 client.login(process.env.BOT_TOKEN);

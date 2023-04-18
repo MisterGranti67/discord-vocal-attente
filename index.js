@@ -2,8 +2,7 @@ const { createAudioPlayer, createAudioResource, entersState, joinVoiceChannel, A
 const { Client, Intents } = require('discord.js');
 const fs = require('fs');
 require('dotenv').config();
-const { generateDependencyReport } = require('@discordjs/voice');
-console.log(generateDependencyReport());
+
 const client = new Client({
   intents: [Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS]
 });
@@ -23,9 +22,11 @@ client.on('messageCreate', async (message) => {
     if (message.content === '-attentelody on') {
         currentTrack = 'musique_attente_1.mp3';
         playAudio(message.guild, currentTrack);
+        message.reply('Musique d\'attente activée !')
     } else if (message.content === '-attentelody off') {
         currentTrack = 'sons_attente.mp3';
         playAudio(message.guild, currentTrack);
+        message.reply('Musique d\'attente désactivée !')
     }
 });
 client.on('voiceStateUpdate', async (oldState, newState) => {
